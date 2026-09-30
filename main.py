@@ -12,6 +12,7 @@ from utils import *
 # Data types: boolean, interger, strings, JSON
 #process: cursor position, position of player in game,score, enemy position, velocity, aim in fps \
 # output: sounds, graphics, haptics, 
+#ooh i changed something
 
 class Game:
     def __init__(self):
