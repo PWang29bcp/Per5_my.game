@@ -42,7 +42,6 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
-        self.cactus = Wall(self,10,10)
         # creates wall
         self.mob = Mob(self,10,5)
         for row, tiles in enumerate(self.map.data):

@@ -45,23 +45,49 @@ class Player(Sprite):
         # gets game class into this code
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
         # sets the game = to game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        #adds the spritesheet
+        self.load_images()
+        #allows the animations to load
         self.image = pg.Surface((TILESIZE,TILESIZE))
         # sets the image size to the size of the time
         self.image = self.spritesheet.get_image(0,0, TILESIZE, TILESIZE)
-        #makes the color white
+        #sets the image of the player
+        #removes the color white
         self.rect = self.image.get_rect()
         #sets the shape to a rectangle
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
         # sets the size fo the pixel, the color, and the position and velocity
+        self.last_update = 0
+        self.current_frame = 0
+        #sets some animation things
         print('player initialized...')
         print(self.rect.x)
         print(self.rect.y)
+        if self.vel.x != 0  and self.vel.y != 0:
+            self.vel *=0.7071
+        self.image.set_colorkey((255,255,255))
+
+    def animate(self):
+        # use the time element to get now
+        now = pg.time.get_ticks()
+        if now - self.last_update > 100:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+            bottom = self.rect.bottom
+            self.image = self.idle_frames[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+            
+        self.image.set_colorkey((255,255,255))
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE,TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE,TILESIZE),]
     def get_keys(self):
         #reset v to 0
         self.vel = vec(0,0)
@@ -99,6 +125,7 @@ class Player(Sprite):
         
         self.get_keys()
         #gets the keys so we can collect inputs
+        self.animate()
         self.rect.center=self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx=self.pos.x
