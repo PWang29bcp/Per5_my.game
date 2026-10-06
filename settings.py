@@ -8,7 +8,7 @@ TILESIZE = 32
 FPS = 30
 
 #enemy settings
-ENEMY_SPEED = 500
+ENEMY_SPEED = 100
 SPRITE_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
 
 #player settings

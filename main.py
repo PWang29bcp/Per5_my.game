@@ -32,9 +32,13 @@ class Game:
 
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
+        #fetches the name of the map file
         self.img_dir = path.join(self.game_dir, 'images')
+        #fetches the images foldr
         self.snd_dir = path.join(self.game_dir, 'audio')
+        #fetches the audio folder
         self.map = Map(path.join(self.game_dir, map))
+        #fetches the map 
 
     def new(self):
         self.load_data('level1.txt')
@@ -42,8 +46,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
-        # creates wall
-        self.mob = Mob(self,10,5)
+        # puts ll the sprites in groups
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == '1':
@@ -52,13 +55,18 @@ class Game:
             for col, tile, in enumerate (tiles):
                 if tile == 'P':
                     Player(self, col,row)
+        for row, tiles in enumerate(self.map.data):
+            for col, tile, in enumerate (tiles):
+                if tile == 'E':
+                    Mob(self, col,row)
 
-        #creates the sprite groups and also adds the player
+        #reads the map text in order to put everything in the right place
 
     def run(self):
         self.playing=True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
+            #sets the frame rate
             self.events()
             self.draw()
             self.update()
@@ -72,13 +80,12 @@ class Game:
                     self.playing = False
                 self.running = False
         #allows you to quit out of the code, everything is an event
+        
 
     def update(self):
         self.all_sprites.update()
         #causes the sprite to update, updating to a new position
-        if len(self.all_mobs) < 1:
-            print ('out of mobs')
-            self.mob = Mob(self,10,5)
+        
         
 
     def draw(self):
