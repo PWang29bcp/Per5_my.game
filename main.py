@@ -80,7 +80,17 @@ class Game:
                     self.playing = False
                 self.running = False
         #allows you to quit out of the code, everything is an event
-        
+    def draw_text(self, text, size, color, x, y):
+        font_name = pg.font.match_font('arial')
+        #sets the font to arial
+        font = pg.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        #sets to color and what text there is
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x,y)
+        # sets the position
+        self.screen.blit(text_surface,text_rect)
+                #puts the thing where it is supposed to be
 
     def update(self):
         self.all_sprites.update()
@@ -91,6 +101,7 @@ class Game:
     def draw(self):
         self.screen.fill(BGCOLOR)
         self.all_sprites.draw(self.screen)  
+        self.draw_text("Frames per second: "+ str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         pg.display.flip()
         # sets the backround color and draws the sprites
 

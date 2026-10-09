@@ -172,6 +172,8 @@ class Player(Sprite):
         collide_with_walls(self, self.game.all_walls, 'y')
         #schecks if the player is touching a wall
         self.rect.center = self.hit_rect.center
+    
+        #sets where each of the frames for the animation are
 
 
 
@@ -186,7 +188,9 @@ class Wall(Sprite):
                 # sets the game = to game
                 self.image = pg.Surface((TILESIZE,TILESIZE))
                 # sets the image size to the size of the time
-                self.image.fill(GREEN)
+                self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+                self.load_images()
+                self.image = self.spritesheet.get_image(0,TILESIZE*2, TILESIZE, TILESIZE)
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
@@ -195,12 +199,16 @@ class Wall(Sprite):
                 self.y = y*TILESIZE
                 self.rect.x = self.x
                 self.rect.y = self.y
+                self.image.set_colorkey((255,255,255))
+                #removes the white in the image                
                 #sets the x and y values
                 # sets the size fo the pixel, the color, and the position and velocity
                 print('wall initialized...')
                 print(self.rect.x)
                 print(self.rect.y)
                 #prints initialization information
+        def load_images(self):
+                self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
 
 class Mob(Sprite):
         def __init__(self, game, x, y):
