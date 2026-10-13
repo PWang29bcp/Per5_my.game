@@ -8,11 +8,11 @@ TILESIZE = 32
 FPS = 30
 
 #enemy settings
-ENEMY_SPEED = 100
-SPRITE_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
+ENEMY_SPEED = 150
+MOB_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
 
 #player settings
-PLAYER_SPEED=300
+PLAYER_SPEED=200
 PLAYER_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
 
 
@@ -20,7 +20,7 @@ PLAYER_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
 WHITE = (255,255,255)
 BGCOLOR = (40,146,155)
 PURPLE=(150, 50, 180)#purple backround filler
-DGRAY=(74,74,74)#dark grey
+DGRAY=(50,50,50)#dark grey
 GRAY=(140,140,155)#light grey
 LGRAY=(198,198,206)#lighter grey
 BLUE=(49,66,105)#blue

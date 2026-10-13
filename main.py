@@ -1,5 +1,5 @@
 #this code is writen by peisho wang
-# code inspired by chris bradfield who was inspired by notch
+# code inspired by chris bradfield who was inspired sssby notch
 
 import pygame as pg
 from os import path
@@ -46,6 +46,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
+        self.all_collectables = pg.sprite.Group()
         # puts ll the sprites in groups
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
@@ -54,11 +55,15 @@ class Game:
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'P':
-                    Player(self, col,row)
+                    self.player = Player(self, col,row)
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'E':
                     Mob(self, col,row)
+        for row, tiles in enumerate(self.map.data):
+            for col, tile, in enumerate (tiles):
+                if tile == 'B':
+                    Collectable(self, col,row,'battery')
 
         #reads the map text in order to put everything in the right place
 
@@ -99,7 +104,7 @@ class Game:
         
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
+        self.screen.fill(DGRAY)
         self.all_sprites.draw(self.screen)  
         self.draw_text("Frames per second: "+ str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         pg.display.flip()
