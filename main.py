@@ -6,6 +6,8 @@ from os import path
 from settings import *
 from sprites import *
 from utils import *
+import random as r
+
 #imports the pygame, our game engine, very cool
 #also imports everything from settings, another one of our files
 # input (events): Keyboard, Mouse, right/left click, voice, power button, location, microphone
@@ -37,6 +39,8 @@ class Game:
         #fetches the images foldr
         self.snd_dir = path.join(self.game_dir, 'audio')
         #fetches the audio folder
+        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir,"metalClick.ogg"))
+        # sound handeling
         self.map = Map(path.join(self.game_dir, map))
         #fetches the map 
 
@@ -47,11 +51,17 @@ class Game:
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
         self.all_collectables = pg.sprite.Group()
+        self.all_ores = pg.sprite.Group()
         # puts ll the sprites in groups
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == '1':
-                    Wall(self, col,row)
+                    ore = r.randint(1,2)
+                    if ore == 1:
+                        Wall(self, col,row)
+                    if ore == 2:
+                        Ores(self,col,row,'iron')
+
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'P':
