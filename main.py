@@ -107,6 +107,7 @@ class Game:
         self.screen.fill(DGRAY)
         self.all_sprites.draw(self.screen)  
         self.draw_text("Frames per second: "+ str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text(f"Coins: {self.player.coins}",24, WHITE, WIDTH/2, HEIGHT/6)
         pg.display.flip()
         # sets the backround color and draws the sprites
 

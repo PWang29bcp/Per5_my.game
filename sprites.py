@@ -96,6 +96,7 @@ class Player(Sprite):
         #slows down the player when walking diagonally
         self.image.set_colorkey((255,255,255))
         #removes the white in the image
+        self.coins = 0
 
     def animate(self):
         # use the time element to get now
@@ -155,7 +156,9 @@ class Player(Sprite):
         #slows down the sprite so it travels at the same speed while travelling diagonally
         #change velocity based on which key is pressed
     def update(self):
-        
+        hits =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
+        if hits:
+             self.coins += 1
         self.get_keys()
         #gets the keys so we can collect inputs
         self.animate()
@@ -270,7 +273,6 @@ class Mob(Sprite):
             self.posydiff = obj.pos.y - self.pos.y
             self.posdiff = (self.posxdiff**2 + self.posydiff**2)**(1/2)
             if self.pos.x != obj.pos.x:
-                print(type(self.vel)) 
                 self.vel.x = ENEMY_SPEED*self.posxdiff/self.posdiff
             else:
                 self.vel.x = 0
