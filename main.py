@@ -52,16 +52,15 @@ class Game:
         self.all_mobs = pg.sprite.Group()
         self.all_collectables = pg.sprite.Group()
         self.all_ores = pg.sprite.Group()
-        # puts ll the sprites in groups
+        # puts all the sprites in groups so twe can give the groups properties
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == '1':
-                    ore = r.randint(1,2)
+                    ore = r.randint(1,15)
                     if ore == 1:
-                        Wall(self, col,row)
-                    if ore == 2:
                         Ores(self,col,row,'iron')
-
+                    else:
+                        Wall(self,col,row)
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'P':
@@ -74,6 +73,7 @@ class Game:
             for col, tile, in enumerate (tiles):
                 if tile == 'B':
                     Collectable(self, col,row,'battery')
+        # checks the tile map for the characters and makes things based on the characters
 
         #reads the map text in order to put everything in the right place
 

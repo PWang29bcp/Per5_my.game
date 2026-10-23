@@ -21,6 +21,7 @@ def collide_with_walls(sprite, group, dir):
             if hits[0].rect.centerx > sprite.hit_rect.centerx:
             #the first hit that we hit
                 sprite.pos.x = hits[0].rect.left - sprite.hit_rect.width/2
+                #moves the sprite backwards based on the collision
             if hits[0].rect.centerx<sprite.hit_rect.centerx:
                 sprite.pos.x = hits[0].rect.right+sprite.hit_rect.width/2
             #moves the sprite back to the initial position
@@ -97,6 +98,7 @@ class Player(Sprite):
         self.image.set_colorkey((255,255,255))
         #removes the white in the image
         self.coins = 0
+        self.last_mine = 0
 
     def animate(self):
         # use the time element to get now
@@ -118,7 +120,14 @@ class Player(Sprite):
         self.image.set_colorkey((255,255,255))
     def mining(self):
         #uses time element to get now
-        hits = pg.sprite.spritecollideq(self,self.game.all_collectables)
+        now = pg.time.get_ticks()
+        hits = pg.sprite.spritecollideq(self,self.game.all_ores, False)
+        if hits:
+            self.last_mine=now
+        if now - self.last_mine >= 2000:
+            pg.spritecollide
+                 
+             
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
@@ -173,10 +182,12 @@ class Player(Sprite):
         self.hit_rect.centerx=self.pos.x
         #sets the position of x again
         collide_with_walls(self, self.game.all_walls, 'x')
+        collide_with_walls(self, self.game.all_ores, 'x')
         # checks if the player is against a wall
         self.hit_rect.centery = self.pos.y
         #sets the y position
         collide_with_walls(self, self.game.all_walls, 'y')
+        collide_with_walls(self, self.game.all_ores, 'y')
         #schecks if the player is touching a wall
         self.rect.center = self.hit_rect.center
     
@@ -185,6 +196,39 @@ class Player(Sprite):
 
 
 class Wall(Sprite):
+        
+        def __init__(self, game, x, y):
+                #init runs only once at the start
+                self.groups = game.all_sprites, game.all_walls
+                # gets game class into this code
+                Sprite.__init__(self, self.groups)
+                self.game = game
+                # sets the game = to game
+                self.image = pg.Surface((TILESIZE,TILESIZE))
+                # sets the image size to the size of the time
+                self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+                self.load_images()
+                self.image = self.spritesheet.get_image(0,TILESIZE*2, TILESIZE, TILESIZE)
+                #makes the color white
+                self.rect = self.image.get_rect()
+                #sets the shape to a rectangle
+                self.vx, self.vy = 0,0
+                self.x = x*TILESIZE
+                self.y = y*TILESIZE
+                self.rect.x = self.x
+                self.rect.y = self.y
+                self.image.set_colorkey((255,255,255))
+                #removes the white in the image                
+                #sets the x and y values
+                # sets the size fo the pixel, the color, and the position and velocity
+                print('wall initialized...')
+                print(self.rect.x)
+                print(self.rect.y)
+                #prints initialization information
+        def load_images(self):
+                self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
+
+class Particle(Sprite):
         
         def __init__(self, game, x, y):
                 #init runs only once at the start
@@ -228,8 +272,7 @@ class Ores(Sprite):
                 self.image = pg.Surface((TILESIZE,TILESIZE))
                 # sets the image size to the size of the time
                 self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
-                self.load_images()
-                self.image = self.spritesheet.get_image(0,TILESIZE*2, TILESIZE, TILESIZE)
+                self.load_images(ore)
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
@@ -246,13 +289,16 @@ class Ores(Sprite):
                 print(self.rect.x)
                 print(self.rect.y)
                 #prints initialization information
-        def load_images(self):
-                self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
+        def load_images(self, ore):
+            if ore == 'iron':
+                self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE, TILESIZE)]
+                
+                self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2, TILESIZE, TILESIZE)
 
 class Mob(Sprite):
         def __init__(self, game, x, y):
             #init runs only once at the start
-            self.groups = game.all_sprites
+            self.groups = game.all_sprites, game.all_mobs
             # gets game class into this code
             Sprite.__init__(self, self.groups)
             self.game = game
@@ -346,10 +392,14 @@ class Mob(Sprite):
             #changes the 
             self.hit_rect.centerx=self.pos.x
             collide_with_walls(self, self.game.all_walls, 'x')
+            collide_with_walls(self, self.game.all_ores, 'x')
+            # checks if the player is against a wall
             self.hit_rect.centery = self.pos.y
+            #sets the y position
             collide_with_walls(self, self.game.all_walls, 'y')
+            collide_with_walls(self, self.game.all_ores, 'y')
             self.rect.center = self.hit_rect.center
-            
+            # makes the collison with walls on the y axis 
 class Collectable(Sprite):  
         def __init__(self, game, x, y, collectable):
                 #init runs only once at the start
