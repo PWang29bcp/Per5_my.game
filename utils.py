@@ -26,3 +26,19 @@ class Spritesheet:
         new_image = pg.transform.scale(image, (width,height))
         image = new_image
         return image
+
+class Cooldown:
+    def __init__(self,time):
+        self.starttime=0
+        self.time = time
+        self.currenttime=self.time
+    def ticking(self):
+        self.currenttime = floor ((pg.time.get_ticks())/1000)
+        self.delta = self.currenttime = self.eventtime
+    def start(self):
+        self.starttime = pg.time.getticks()
+    def ready (self):
+        self.currenttime = pg.time.getticks()
+        if self.currenttime - self.starttime >= self.time:
+            return True
+        return False

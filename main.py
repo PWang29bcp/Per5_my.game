@@ -42,7 +42,7 @@ class Game:
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir,"metalClick.ogg"))
         # sound handeling
         self.map = Map(path.join(self.game_dir, map))
-        #fetches the map 
+        #fetc hes the map 
 
     def new(self):
         self.load_data('level1.txt')
@@ -52,6 +52,7 @@ class Game:
         self.all_mobs = pg.sprite.Group()
         self.all_collectables = pg.sprite.Group()
         self.all_ores = pg.sprite.Group()
+        self.all_particles = pg.sprite.Group()
         # puts all the sprites in groups so twe can give the groups properties
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):

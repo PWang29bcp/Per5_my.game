@@ -3,6 +3,7 @@ import pygame as pg
 from pygame.sprite import Sprite
 from settings import *
 from utils import *
+from random import randint
 
 from os import path
 
@@ -170,6 +171,8 @@ class Player(Sprite):
     def update(self):
         hits =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
         if hits:
+             for i in range (10):
+                 Particle(self.game, hits[0].pos.x, hits[0].pos.y)
              self.coins += 1
              self.game.pickup_snd.play()
         self.get_keys()
@@ -232,34 +235,43 @@ class Particle(Sprite):
         
         def __init__(self, game, x, y):
                 #init runs only once at the start
-                self.groups = game.all_sprites, game.all_walls
+                self.groups = game.all_sprites, game.all_particles
                 # gets game class into this code
                 Sprite.__init__(self, self.groups)
                 self.game = game
                 # sets the game = to game
-                self.image = pg.Surface((TILESIZE,TILESIZE))
+                self.image = pg.Surface((TILESIZE/8,TILESIZE/8))
                 # sets the image size to the size of the time
-                self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
-                self.load_images()
-                self.image = self.spritesheet.get_image(0,TILESIZE*2, TILESIZE, TILESIZE)
+                self.image.fill(GREEN)
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
                 self.vx, self.vy = 0,0
-                self.x = x*TILESIZE
-                self.y = y*TILESIZE
-                self.rect.x = self.x
-                self.rect.y = self.y
+                self.pos = vec(x,y)
+                self.speed = 25
+                self.rect.x = self.pos.x
+                self.rect.y = self.pos.y
+                self.countdown = Cooldown(5000)
+                self.countdown.eventtime=floor(pg.time.get_ticks()/1000)
                 self.image.set_colorkey((255,255,255))
                 #removes the white in the image                
                 #sets the x and y values
                 # sets the size fo the pixel, the color, and the position and velocity
-                print('wall initialized...')
+                print('particle initialized...')
                 print(self.rect.x)
                 print(self.rect.y)
                 #prints initialization information
-        def load_images(self):
-                self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
+                
+        def update(self):
+             self.countdown.ticking()
+             self.pos.x +=self.speed*randint(-5,5)
+             self.pos.y += self.speed*randint(-5,5)
+             print("'updaiting")
+             if self.countdown.delta > 10:
+                  self.kill()
+             self.rect.x = self.pos.x
+             self.rect.y = self.pos.y
+
 class Ores(Sprite):
         
         def __init__(self, game, x, y, ore):
@@ -414,10 +426,9 @@ class Collectable(Sprite):
                 self.load_images(collectable)
                 #sets the shape to a rectangle
                 self.vx, self.vy = 0,0
-                self.x = x*TILESIZE
-                self.y = y*TILESIZE
-                self.rect.x = self.x
-                self.rect.y = self.y
+                self.pos = vec(x*TILESIZE,y*TILESIZE)
+                self.rect.x = self.pos.x
+                self.rect.y = self.pos.y
                 self.image.set_colorkey((255,255,255))
                 #removes the white in the image                
                 #sets the x and y values
