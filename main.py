@@ -59,6 +59,7 @@ class Game:
                 if tile == '1':
                     ore = r.randint(1,15)
                     if ore == 1:
+                        Wall(self,col,row)
                         Ores(self,col,row,'iron')
                     else:
                         Wall(self,col,row)
@@ -119,8 +120,9 @@ class Game:
         self.all_sprites.draw(self.screen)  
         self.draw_text("Frames per second: "+ str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         self.draw_text(f"Coins: {self.player.coins}",24, WHITE, WIDTH/2, HEIGHT/6)
+        self.draw_text(f"Ores: {self.player.ores}",24, WHITE, WIDTH/10, HEIGHT/8)
         pg.display.flip()
-        # sets the backround color and draws the sprites
+        # sets the backround color and draws the spritesa
 
 
 if __name__ == "__main__":

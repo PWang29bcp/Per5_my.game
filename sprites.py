@@ -88,6 +88,7 @@ class Player(Sprite):
         # sets the size fo the pixel, the color, and the position and velocity
         self.last_update = 0
         self.current_frame = 0
+        self.mines = 0
         #sets some animation things
         print('player initialized...')
         print(self.rect.x)
@@ -100,6 +101,7 @@ class Player(Sprite):
         #removes the white in the image
         self.coins = 0
         self.last_mine = 0
+        self.ores=0
 
     def animate(self):
         # use the time element to get now
@@ -120,13 +122,20 @@ class Player(Sprite):
             
         self.image.set_colorkey((255,255,255))
     def mining(self):
-        #uses time element to get now
+        mines = pg.sprite.spritecollide(self, self.game.all_ores, False)
         now = pg.time.get_ticks()
-        hits = pg.sprite.spritecollideq(self,self.game.all_ores, False)
-        if hits:
-            self.last_mine=now
-        if now - self.last_mine >= 2000:
-            pg.spritecollide
+        if mines:
+
+             print('trying to mine')
+             if now - self.mines > 1000:
+                
+                print('trying to mine')
+                pg.sprite.spritecollide(self, self.game.all_ores, True)
+                self.ores += 1
+
+        else:
+             self.mines=now
+            
                  
              
     def load_images(self):
@@ -169,12 +178,14 @@ class Player(Sprite):
         #slows down the sprite so it travels at the same speed while travelling diagonally
         #change velocity based on which key is pressed
     def update(self):
-        hits =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
-        if hits:
-             for i in range (10):
-                 Particle(self.game, hits[0].pos.x, hits[0].pos.y)
+        collect =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
+        if collect:
+             for i in range (100):
+                 Particle(self.game, collect[0].pos.x, collect[0].pos.y)
              self.coins += 1
              self.game.pickup_snd.play()
+        self.mining()
+
         self.get_keys()
         #gets the keys so we can collect inputs
         self.animate()
@@ -193,6 +204,7 @@ class Player(Sprite):
         collide_with_walls(self, self.game.all_ores, 'y')
         #schecks if the player is touching a wall
         self.rect.center = self.hit_rect.center
+        
     
         #sets where each of the frames for the animation are
 
@@ -230,6 +242,7 @@ class Wall(Sprite):
                 #prints initialization information
         def load_images(self):
                 self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
+        
 
 class Particle(Sprite):
         
@@ -246,12 +259,12 @@ class Particle(Sprite):
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
-                self.vx, self.vy = 0,0
+                self.vx, self.vy = randint(-100,100),randint(-100,100)
                 self.pos = vec(x,y)
-                self.speed = 25
+                self.speed = 1
                 self.rect.x = self.pos.x
                 self.rect.y = self.pos.y
-                self.countdown = Cooldown(5000)
+                self.countdown = Cooldown()
                 self.countdown.eventtime=floor(pg.time.get_ticks()/1000)
                 self.image.set_colorkey((255,255,255))
                 #removes the white in the image                
@@ -264,13 +277,15 @@ class Particle(Sprite):
                 
         def update(self):
              self.countdown.ticking()
-             self.pos.x +=self.speed*randint(-5,5)
-             self.pos.y += self.speed*randint(-5,5)
+             self.pos.x +=self.speed*self.vx*self.game.dt
+             self.pos.y += self.speed*self.vy*self.game.dt
              print("'updaiting")
-             if self.countdown.delta > 10:
+             if self.countdown.delta > 2:
                   self.kill()
              self.rect.x = self.pos.x
              self.rect.y = self.pos.y
+
+
 
 class Ores(Sprite):
         
@@ -306,6 +321,10 @@ class Ores(Sprite):
                 self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE, TILESIZE)]
                 
                 self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2, TILESIZE, TILESIZE)
+                self.mining1 = self.spritesheet.get_image(TILESIZE,TILESIZE*3, TILESIZE, TILESIZE)
+                self.mining2 = self.spritesheet.get_image(TILESIZE,TILESIZE*4, TILESIZE, TILESIZE)
+        def update(self):
+            pass
 
 class Mob(Sprite):
         def __init__(self, game, x, y):
