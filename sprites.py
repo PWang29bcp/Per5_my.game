@@ -3,7 +3,7 @@ import pygame as pg
 from pygame.sprite import Sprite
 from settings import *
 from utils import *
-from random import randint
+import random as r
 
 from os import path
 
@@ -259,7 +259,14 @@ class Particle(Sprite):
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
-                self.vx, self.vy = randint(-100,100),randint(-100,100)
+                self.vx = r.randint(-100,100)
+                
+                self.vy = ((100)**2-(self.vx)**2)**(1/2)
+                self.slowdown = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+                self.posorneg =[-1,1]
+                self.vy *= r.choice(self.slowdown)
+                self.vx *= r.choice(self.slowdown)
+                self.vy *= r.choice(self.posorneg)
                 self.pos = vec(x,y)
                 self.speed = 1
                 self.rect.x = self.pos.x

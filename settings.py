@@ -14,6 +14,7 @@ MOB_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
 #player settings
 PLAYER_SPEED=200
 PLAYER_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
+PLAYER_FRIC = -0.1
 
 
 #colors

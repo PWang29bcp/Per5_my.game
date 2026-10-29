@@ -13,7 +13,7 @@ import random as r
 # input (events): Keyboard, Mouse, right/left click, voice, power button, location, microphone
 # Data types: boolean, interger, strings, JSON
 #process: cursor position, position of player in game,score, enemy position, velocity, aim in fps \
-# output: sounds, graphics, haptics, 
+# output: sounds, graphics, haptics
 #ooh i changed something
 
 class Game:
