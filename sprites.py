@@ -26,8 +26,8 @@ def collide_with_walls(sprite, group, dir):
             if hits[0].rect.centerx<sprite.hit_rect.centerx:
                 sprite.pos.x = hits[0].rect.right+sprite.hit_rect.width/2
             #moves the sprite back to the initial position
-        sprite.vel.x=0
-        #resets the velocity to 0
+            sprite.vel.x=0
+            #resets the velocity to 0
         sprite.hit_rect.centerx = sprite.pos.x
         
                
@@ -84,6 +84,7 @@ class Player(Sprite):
         #sets the shape to a rectangle
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
+        self.acl = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         # sets the size fo the pixel, the color, and the position and velocity
         self.last_update = 0
@@ -94,14 +95,14 @@ class Player(Sprite):
         print(self.rect.x)
         print(self.rect.y)
         #prints the initial position
-        if self.vel.x != 0  and self.vel.y != 0:
-            self.vel *=0.7071
+       
         #slows down the player when walking diagonally
         self.image.set_colorkey((255,255,255))
         #removes the white in the image
         self.coins = 0
         self.last_mine = 0
         self.ores=0
+        self.miningprogress = 0
 
     def animate(self):
         # use the time element to get now
@@ -124,10 +125,14 @@ class Player(Sprite):
     def mining(self):
         mines = pg.sprite.spritecollide(self, self.game.all_ores, False)
         now = pg.time.get_ticks()
+        # checks for collision and current time
         if mines:
 
              print('trying to mine')
-             if now - self.mines > 1000:
+             self.miningprogress = now - self.mines
+
+             
+             if self.miningprogress > 1000:
                 
                 print('trying to mine')
                 pg.sprite.spritecollide(self, self.game.all_ores, True)
@@ -145,39 +150,34 @@ class Player(Sprite):
                             self.spritesheet.get_image(TILESIZE*3,0,TILESIZE,TILESIZE),]
         #sets where each of the frames for the animation are
     def get_keys(self):
-        #reset v to 0
-        self.vel = vec(0,0)
+        
         #listen for events specific to keys
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            #print('trying to go left')
-            self.vel.x=-PLAYER_SPEED
-            #self.vx=-PLAYER_SPEED
+          
+            self.acl.x=-PLAYER_SPEED
             #allows for the player to go left using the a or left keys
 
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            #print('trying to go right')
-            self.vel.x=PLAYER_SPEED
-            #self.vx=PLAYER_SPEED
+            
+            self.acl.x=PLAYER_SPEED
             #allows the player to go right using the right or d keys
 
         if keys[pg.K_UP] or keys[pg.K_w]:
-            #print('trying to go up')
-            self.vel.y=-PLAYER_SPEED
-            #self.vy=PLAYER_SPEED
+            
+            self.acl.y=-PLAYER_SPEED
+
             #allows the palyer to go up using the w or up keys, it is reverse for some reason
 
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            #print('trying to go down')
-            self.vel.y=PLAYER_SPEED
-            #self.vy=-PLAYER_SPEED
-            #print (self.y)
+            
+            self.acl.y=PLAYER_SPEED
             #allows the player to go down using the down or s key, is also reverse
-        if self.vel.x != 0  and self.vel.y != 0:
-             self.vel *=0.7071
+        
         #slows down the sprite so it travels at the same speed while travelling diagonally
         #change velocity based on which key is pressed
     def update(self):
+        self.acl = vec (0,0)
         collect =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
         if collect:
              for i in range (100):
@@ -187,26 +187,42 @@ class Player(Sprite):
         self.mining()
 
         self.get_keys()
+        self.acl.x += self.vel.x*PLAYER_FRIC
+        self.acl.y += self.vel.y*PLAYER_FRIC
+        #accounts for friction
+        self.vel.x += self.acl.x
+        self.vel.y += self.acl.y
         #gets the keys so we can collect inputs
+        
+        if self.vel.x >= PLAYER_MAX_SPEED:
+            self.vel.x = PLAYER_MAX_SPEED
+            print('trying to cap speed')
+        if self.vel.y >= PLAYER_MAX_SPEED:
+            self.vel.y = PLAYER_MAX_SPEED
+        
+        
         self.animate()
+        #animates the player
         self.rect.center=self.pos
         #sets the position
-        self.pos += self.vel * self.game.dt
-        #moves the position in accordance to the velocity and tick rate
+
+        self.pos.x+= self.vel.x + 0.5 *self.acl.x
+        self.pos.y+= self.vel.y + 0.5 *self.acl.y
+        #moves the position in accordance to the velocity and acceleration
         self.hit_rect.centerx=self.pos.x
-        #sets the position of x again
+        #sets the position of x 
+        
         collide_with_walls(self, self.game.all_walls, 'x')
-        collide_with_walls(self, self.game.all_ores, 'x')
         # checks if the player is against a wall
         self.hit_rect.centery = self.pos.y
         #sets the y position
         collide_with_walls(self, self.game.all_walls, 'y')
-        collide_with_walls(self, self.game.all_ores, 'y')
         #schecks if the player is touching a wall
         self.rect.center = self.hit_rect.center
         
     
         #sets where each of the frames for the animation are
+        print (self.miningprogress)
 
 
 
@@ -328,10 +344,12 @@ class Ores(Sprite):
                 self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE, TILESIZE)]
                 
                 self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2, TILESIZE, TILESIZE)
-                self.mining1 = self.spritesheet.get_image(TILESIZE,TILESIZE*3, TILESIZE, TILESIZE)
-                self.mining2 = self.spritesheet.get_image(TILESIZE,TILESIZE*4, TILESIZE, TILESIZE)
+                self.mining1 = self.spritesheet.get_image(TILESIZE*2,TILESIZE*2, TILESIZE, TILESIZE)
+                self.mining2 = self.spritesheet.get_image(TILESIZE*3,TILESIZE*2, TILESIZE, TILESIZE)
         def update(self):
-            pass
+            if self.game.player.miningprogress > 666:
+                 self.mineimage = self.mining2
+            
 
 class Mob(Sprite):
         def __init__(self, game, x, y):
@@ -424,6 +442,7 @@ class Mob(Sprite):
 
             self.animate()
             self.chase(self.game.player)
+            print (self.vel)
             self.rect.center=self.pos
             #sets the position
             self.pos = self.pos + (self.vel * self.game.dt)

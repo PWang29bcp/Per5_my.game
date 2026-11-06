@@ -13,7 +13,7 @@ import random as r
 # input (events): Keyboard, Mouse, right/left click, voice, power button, location, microphone
 # Data types: boolean, interger, strings, JSON
 #process: cursor position, position of player in game,score, enemy position, velocity, aim in fps \
-# output: sounds, graphics, haptics
+# output: sounds, graphics, haptics, 
 #ooh i changed something
 
 class Game:
@@ -54,6 +54,11 @@ class Game:
         self.all_ores = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
         # puts all the sprites in groups so twe can give the groups properties
+        
+        for row, tiles in enumerate(self.map.data):
+                    for col, tile, in enumerate (tiles):
+                        if tile == 'P':
+                            self.player = Player(self, col,row)
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == '1':
@@ -63,10 +68,7 @@ class Game:
                         Ores(self,col,row,'iron')
                     else:
                         Wall(self,col,row)
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate (tiles):
-                if tile == 'P':
-                    self.player = Player(self, col,row)
+        
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'E':
@@ -122,7 +124,7 @@ class Game:
         self.draw_text(f"Coins: {self.player.coins}",24, WHITE, WIDTH/2, HEIGHT/6)
         self.draw_text(f"Ores: {self.player.ores}",24, WHITE, WIDTH/10, HEIGHT/8)
         pg.display.flip()
-        # sets the backround color and draws the spritesa
+        # sets the backround color and draws the sprites
 
 
 if __name__ == "__main__":
