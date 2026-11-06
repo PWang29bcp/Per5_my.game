@@ -67,7 +67,7 @@ def bounce_with_walls(sprite, group, dir):
 class Player(Sprite):
     def __init__(self, game, x, y):
         #init runs only once at the start
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.all_players
         # gets game class into this code
         Sprite.__init__(self, self.groups)
         self.game = game
@@ -302,7 +302,6 @@ class Particle(Sprite):
              self.countdown.ticking()
              self.pos.x +=self.speed*self.vx*self.game.dt
              self.pos.y += self.speed*self.vy*self.game.dt
-             print("'updaiting")
              if self.countdown.delta > 2:
                   self.kill()
              self.rect.x = self.pos.x
@@ -343,12 +342,23 @@ class Ores(Sprite):
             if ore == 'iron':
                 self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE, TILESIZE)]
                 
+                self.unmined = self.spritesheet.get_image(TILESIZE,TILESIZE*2, TILESIZE, TILESIZE)
                 self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2, TILESIZE, TILESIZE)
                 self.mining1 = self.spritesheet.get_image(TILESIZE*2,TILESIZE*2, TILESIZE, TILESIZE)
                 self.mining2 = self.spritesheet.get_image(TILESIZE*3,TILESIZE*2, TILESIZE, TILESIZE)
         def update(self):
-            if self.game.player.miningprogress > 666:
-                 self.mineimage = self.mining2
+            mining = pg.sprite.spritecollide(self, self.game.all_players, False)
+            if mining:
+
+                if self.game.player.miningprogress < 333:
+                    self.image = self.unmined  
+                elif self.game.player.miningprogress < 666:
+                    self.image = self.mining1
+                elif self.game.player.miningprogress > 666:
+                    self.image = self.mining2
+                
+            else:
+                self.image = self.unmined
             
 
 class Mob(Sprite):

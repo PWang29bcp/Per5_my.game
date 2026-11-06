@@ -53,8 +53,9 @@ class Game:
         self.all_collectables = pg.sprite.Group()
         self.all_ores = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
+        self.all_players =pg.sprite.Group()
         # puts all the sprites in groups so twe can give the groups properties
-        
+
         for row, tiles in enumerate(self.map.data):
                     for col, tile, in enumerate (tiles):
                         if tile == 'P':
