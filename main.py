@@ -39,13 +39,14 @@ class Game:
         #fetches the images foldr
         self.snd_dir = path.join(self.game_dir, 'audio')
         #fetches the audio folder
+        self.lvl_dir = path.join (self.game_dir, 'levels')
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir,"metalClick.ogg"))
         # sound handeling
-        self.map = Map(path.join(self.game_dir, map))
+        self.map = Map(path.join(self.lvl_dir, map))
         #fetc hes the map 
 
     def new(self):
-        self.load_data('level1.txt')
+        self.load_data('startingroom.txt')
         print(self.map.data)
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
@@ -53,13 +54,8 @@ class Game:
         self.all_collectables = pg.sprite.Group()
         self.all_ores = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
-        self.all_players =pg.sprite.Group()
+        self.all_players = pg.sprite.Group()
         # puts all the sprites in groups so twe can give the groups properties
-
-        for row, tiles in enumerate(self.map.data):
-                    for col, tile, in enumerate (tiles):
-                        if tile == 'P':
-                            self.player = Player(self, col,row)
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == '1':
@@ -69,7 +65,10 @@ class Game:
                         Ores(self,col,row,'iron')
                     else:
                         Wall(self,col,row)
-        
+        for row, tiles in enumerate(self.map.data):
+            for col, tile, in enumerate (tiles):
+                if tile == 'P':
+                    self.player = Player(self, col,row)
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
                 if tile == 'E':

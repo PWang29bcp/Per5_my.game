@@ -415,6 +415,7 @@ class Mob(Sprite):
                                 self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE),
                                 self.spritesheet.get_image(TILESIZE*2,TILESIZE,TILESIZE,TILESIZE),
                                 self.spritesheet.get_image(TILESIZE*3,TILESIZE,TILESIZE,TILESIZE),]
+        
         def chase(self, obj): 
             self.posxdiff = obj.pos.x - self.pos.x
 
@@ -498,3 +499,27 @@ class Collectable(Sprite):
                 self.image = self.spritesheet.get_image(0,TILESIZE*3, TILESIZE, TILESIZE)
                 #makes the color white
                 self.rect = self.image.get_rect()
+class Aggrorange(Sprite):
+     def __init__(self, game, x, y, radius):
+        #init runs only once at the start
+        self.groups = game.all_sprites, game.all_collectables
+        # gets game class into this code
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        # sets the game = to game
+        self.image = pg.Surface((TILESIZE,TILESIZE))
+        # sets the image size to the size of the time
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        #sets the shape to a rectangle
+        self.vx, self.vy = 0,0
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+        self.image.set_colorkey((255,255,255))
+        #removes the white in the image                
+        #sets the x and y values
+        # sets the size fo the pixel, the color, and the position and velocity
+        print('wall initialized...')
+        print(self.rect.x)
+        print(self.rect.y)
+        #prints initialization information

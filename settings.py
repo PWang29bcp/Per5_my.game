@@ -2,7 +2,7 @@ import pygame as pg
 
 #general settings
 WIDTH = 1024
-HEIGHT = 768
+HEIGHT = 768 
 TITLE = "pwangs epic robot game"
 TILESIZE = 32
 FPS = 30
