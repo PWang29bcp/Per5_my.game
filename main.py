@@ -55,6 +55,8 @@ class Game:
         self.all_ores = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
         self.all_players = pg.sprite.Group()
+        self.all_gateways = pg.sprite.Group()
+        self.all_aggros = pg.sprite.Group()
         # puts all the sprites in groups so twe can give the groups properties
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate (tiles):
@@ -65,18 +67,15 @@ class Game:
                         Ores(self,col,row,'iron')
                     else:
                         Wall(self,col,row)
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate (tiles):
                 if tile == 'P':
                     self.player = Player(self, col,row)
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate (tiles):
                 if tile == 'E':
-                    Mob(self, col,row)
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate (tiles):
+                    self.mob = Mob(self, col,row)
+                    self.aggro = Aggrorange (self, col, row, TILESIZE*5, self.mob)
                 if tile == 'B':
                     Collectable(self, col,row,'battery')
+                if tile == "`":
+                    Gateway(self,col,row)
         # checks the tile map for the characters and makes things based on the characters
 
         #reads the map text in order to put everything in the right place

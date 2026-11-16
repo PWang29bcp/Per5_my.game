@@ -103,6 +103,7 @@ class Player(Sprite):
         self.last_mine = 0
         self.ores=0
         self.miningprogress = 0
+        self.transporting = False
 
     def animate(self):
         # use the time element to get now
@@ -140,7 +141,13 @@ class Player(Sprite):
 
         else:
              self.mines=now
-            
+    def newroom(self):
+        transport = pg.sprite.spritecollide(self, self.game.all_gateways, False)
+        if transport:
+             print('transporting....')   
+             self.transporting = True
+        else:
+             self.transporting = False         
                  
              
     def load_images(self):
@@ -173,9 +180,17 @@ class Player(Sprite):
             
             self.acl.y=PLAYER_SPEED
             #allows the player to go down using the down or s key, is also reverse
+        if keys[pg.K_p]:
+            print('')
         
         #slows down the sprite so it travels at the same speed while travelling diagonally
         #change velocity based on which key is pressed
+    def get_aggrod(self):
+        aggroing = pg.sprite.collide_circle(self, self.game.aggro)
+        # checks for collision and current time
+        if aggroing:
+
+            print('trying to agrro')
     def update(self):
         self.acl = vec (0,0)
         collect =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
@@ -185,8 +200,9 @@ class Player(Sprite):
              self.coins += 1
              self.game.pickup_snd.play()
         self.mining()
-
+        self.newroom()
         self.get_keys()
+        self.get_aggrod()
         self.acl.x += self.vel.x*PLAYER_FRIC
         self.acl.y += self.vel.y*PLAYER_FRIC
         #accounts for friction
@@ -222,7 +238,10 @@ class Player(Sprite):
         
     
         #sets where each of the frames for the animation are
-        print (self.miningprogress)
+    
+
+            
+           
 
 
 
@@ -259,6 +278,35 @@ class Wall(Sprite):
         def load_images(self):
                 self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*2,TILESIZE, TILESIZE)]
         
+class Gateway(Sprite):
+        
+        def __init__(self, game, x, y):
+                #init runs only once at the start
+                self.groups = game.all_sprites, game.all_gateways
+                # gets game class into this code
+                Sprite.__init__(self, self.groups)
+                self.game = game
+                # sets the game = to game
+                self.image = pg.Surface((TILESIZE,TILESIZE))
+                # sets the image size to the size of the time
+                self.image.fill(GREEN)
+                #makes the color white
+                self.rect = self.image.get_rect()
+                #sets the shape to a rectangle
+                self.vx, self.vy = 0,0
+                self.x = x*TILESIZE
+                self.y = y*TILESIZE
+                self.rect.x = self.x
+                self.rect.y = self.y
+                self.image.set_colorkey((255,255,255))
+                #removes the white in the image                
+                #sets the x and y values
+                # sets the size fo the pixel, the color, and the position and velocity
+                print('wall initialized...')
+                print(self.rect.x)
+                print(self.rect.y)
+                #prints initialization information
+        
 
 class Particle(Sprite):
         
@@ -289,6 +337,7 @@ class Particle(Sprite):
                 self.rect.y = self.pos.y
                 self.countdown = Cooldown()
                 self.countdown.eventtime=floor(pg.time.get_ticks()/1000)
+                # makes the particles explode in a circle and them make them more random
                 self.image.set_colorkey((255,255,255))
                 #removes the white in the image                
                 #sets the x and y values
@@ -363,6 +412,7 @@ class Ores(Sprite):
 
 class Mob(Sprite):
         def __init__(self, game, x, y):
+            print (x, y)
             #init runs only once at the start
             self.groups = game.all_sprites, game.all_mobs
             # gets game class into this code
@@ -388,6 +438,7 @@ class Mob(Sprite):
             self.last_update = 0
             self.current_frame = 0
             #sets some animation things
+            print(self.pos)
             print('mob initialized...')
             print(self.rect.x)
             print(self.rect.y)
@@ -417,19 +468,20 @@ class Mob(Sprite):
                                 self.spritesheet.get_image(TILESIZE*3,TILESIZE,TILESIZE,TILESIZE),]
         
         def chase(self, obj): 
-            self.posxdiff = obj.pos.x - self.pos.x
+             pass
+            # self.posxdiff = obj.pos.x - self.pos.x
 
-            self.posydiff = obj.pos.y - self.pos.y
-            self.posdiff = (self.posxdiff**2 + self.posydiff**2)**(1/2)
-            if self.pos.x != obj.pos.x:
-                self.vel.x = ENEMY_SPEED*self.posxdiff/self.posdiff
-            else:
-                self.vel.x = 0
+            # self.posydiff = obj.pos.y - self.pos.y
+            # self.posdiff = (self.posxdiff**2 + self.posydiff**2)**(1/2)
+            # if self.pos.x != obj.pos.x:
+            #     self.vel.x = ENEMY_SPEED*self.posxdiff/self.posdiff
+            # else:
+            #     self.vel.x = 0
 
-            if self.pos.y != obj.pos.y:
-                self.vel.y = ENEMY_SPEED*self.posydiff/self.posdiff
-            else:
-                self.vel.y = 0
+            # if self.pos.y != obj.pos.y:
+            #     self.vel.y = ENEMY_SPEED*self.posydiff/self.posdiff
+            # else:
+            #     self.vel.y = 0
             
         def update(self):
 
@@ -453,7 +505,6 @@ class Mob(Sprite):
 
             self.animate()
             self.chase(self.game.player)
-            print (self.vel)
             self.rect.center=self.pos
             #sets the position
             self.pos = self.pos + (self.vel * self.game.dt)
@@ -500,26 +551,33 @@ class Collectable(Sprite):
                 #makes the color white
                 self.rect = self.image.get_rect()
 class Aggrorange(Sprite):
-     def __init__(self, game, x, y, radius):
-        #init runs only once at the start
-        self.groups = game.all_sprites, game.all_collectables
-        # gets game class into this code
+    def __init__(self, game, x, y, radius, enemy):
+        self.groups = game.all_sprites, game.all_aggros
+        print(x, y)
         Sprite.__init__(self, self.groups)
         self.game = game
-        # sets the game = to game
-        self.image = pg.Surface((TILESIZE,TILESIZE))
-        # sets the image size to the size of the time
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
-        #sets the shape to a rectangle
-        self.vx, self.vy = 0,0
-        self.pos = vec(x*TILESIZE,y*TILESIZE)
-        self.rect.x = self.pos.x
-        self.rect.y = self.pos.y
-        self.image.set_colorkey((255,255,255))
-        #removes the white in the image                
-        #sets the x and y values
-        # sets the size fo the pixel, the color, and the position and velocity
-        print('wall initialized...')
-        print(self.rect.x)
-        print(self.rect.y)
-        #prints initialization information
+        self.enemy = enemy
+        self.radius = radius
+        self.image = pg.Surface((TILESIZE*10, TILESIZE*10))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.vel = vec(0,0) 
+        self.pos = vec(x,y) * TILESIZE
+        self.rect.center = self.pos
+        pg.draw.circle(self.image, GREEN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+        print (self.pos)
+
+        
+        print('aggro initialized')
+
+    def update(self):
+        self.pos = self.enemy.pos
+        self.rect.center = self.pos
+        pg.draw.circle(self.image, GREEN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+
+
+
+
+
+class LoadingScreen(Sprite):
+     pass
