@@ -182,6 +182,7 @@ class Player(Sprite):
             #allows the player to go down using the down or s key, is also reverse
         if keys[pg.K_p]:
             print('')
+            self.game.mob.explode()
         
         #slows down the sprite so it travels at the same speed while travelling diagonally
         #change velocity based on which key is pressed
@@ -191,18 +192,18 @@ class Player(Sprite):
         if aggroing:
 
             print('trying to agrro')
+    
     def update(self):
         self.acl = vec (0,0)
         collect =  pg.sprite.spritecollide(self, self.game.all_collectables, True)
         if collect:
              for i in range (100):
-                 Particle(self.game, collect[0].pos.x, collect[0].pos.y)
+                 Particle(self.game, collect[0].pos.x, collect[0].pos.y, GREEN)
              self.coins += 1
              self.game.pickup_snd.play()
         self.mining()
         self.newroom()
         self.get_keys()
-        self.get_aggrod()
         self.acl.x += self.vel.x*PLAYER_FRIC
         self.acl.y += self.vel.y*PLAYER_FRIC
         #accounts for friction
@@ -310,7 +311,7 @@ class Gateway(Sprite):
 
 class Particle(Sprite):
         
-        def __init__(self, game, x, y):
+        def __init__(self, game, x, y, color):
                 #init runs only once at the start
                 self.groups = game.all_sprites, game.all_particles
                 # gets game class into this code
@@ -319,7 +320,7 @@ class Particle(Sprite):
                 # sets the game = to game
                 self.image = pg.Surface((TILESIZE/8,TILESIZE/8))
                 # sets the image size to the size of the time
-                self.image.fill(GREEN)
+                self.image.fill(color)
                 #makes the color white
                 self.rect = self.image.get_rect()
                 #sets the shape to a rectangle
@@ -431,18 +432,32 @@ class Mob(Sprite):
             #sets the shape to a rectangle
             
             self.hit_rect =  MOB_HIT_RECT
-            self.vel = vec(ENEMY_SPEED,ENEMY_SPEED)
+            self.vel = vec(0,0)
+            self.acl = vec(0,0)
             self.pos = vec(x*TILESIZE,y*TILESIZE)
             # sets the size fo the pixel, the color, and the position and velocity
             #sets some animation things
             self.last_update = 0
             self.current_frame = 0
+            self.dying = 0
+            self.exploding = False
             #sets some animation things
             print(self.pos)
             print('mob initialized...')
             print(self.rect.x)
             print(self.rect.y)
             # prints initialization informations
+        def aggroing(self, obj):
+            self.posxdiff = obj.pos.x - self.pos.x
+            self.posydiff = obj.pos.y - self.pos.y
+            self.posdiff = (self.posxdiff**2 + self.posydiff**2)**(1/2)
+            if self.posdiff < TILESIZE*5:
+                 print ('trying to chase')
+                 self.chase(obj)
+            else:
+                self.acl = vec(0,0)
+                 
+        
         def animate(self):
             # use the time element to get now
             now = pg.time.get_ticks()
@@ -466,59 +481,76 @@ class Mob(Sprite):
                                 self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE),
                                 self.spritesheet.get_image(TILESIZE*2,TILESIZE,TILESIZE,TILESIZE),
                                 self.spritesheet.get_image(TILESIZE*3,TILESIZE,TILESIZE,TILESIZE),]
+            self.death_frame = self.spritesheet.get_image(TILESIZE*4,TILESIZE,TILESIZE, TILESIZE)
         
         def chase(self, obj): 
-             pass
-            # self.posxdiff = obj.pos.x - self.pos.x
-
-            # self.posydiff = obj.pos.y - self.pos.y
-            # self.posdiff = (self.posxdiff**2 + self.posydiff**2)**(1/2)
-            # if self.pos.x != obj.pos.x:
-            #     self.vel.x = ENEMY_SPEED*self.posxdiff/self.posdiff
-            # else:
-            #     self.vel.x = 0
-
-            # if self.pos.y != obj.pos.y:
-            #     self.vel.y = ENEMY_SPEED*self.posydiff/self.posdiff
-            # else:
-            #     self.vel.y = 0
             
+            if self.pos.x != obj.pos.x:
+                self.acl.x = ENEMY_SPEED*self.posxdiff/self.posdiff
+            else:
+                self.vel.x = 0
+
+            if self.pos.y != obj.pos.y:
+                self.acl.y = ENEMY_SPEED*self.posydiff/self.posdiff
+            else:
+                self.vel.y = 0
+
+        def explode(self):
+            self.image = self.death_frame
+            
+            self.now = pg.time.get_ticks()
+            self.dying = self.now
+            self.exploding = True
+            
+
         def update(self):
-
-            # if (self.pos.x >= WIDTH-TILESIZE):
-            #     print ('crossing +x border')
-            #     self.vel.x *= -1
-            
-            # if (self.pos.x <= 0):
-            #     print ('crossing -x border')
-            #     self.vel.x*=-1
-
-            # if (self.pos.y >= HEIGHT-TILESIZE):
-            #     print ('crossing -y border')
-            #     self.vel.y*=-1
+            if self.exploding == True:
+                pass
+            else:
+                    
+                # if (self.pos.x >= WIDTH-TILESIZE):
+                #     print ('crossing +x border')
+                #     self.vel.x *= -1
                 
-            # if (self.pos.y <= 0):
-            #     print ('crossing +y border')
-            #     self.vel.y*=-1
-            #checks if the mob is leaving the screen
+                # if (self.pos.x <= 0):
+                #     print ('crossing -x border')
+                #     self.vel.x*=-1
 
+                # if (self.pos.y >= HEIGHT-TILESIZE):
+                #     print ('crossing -y border')
+                #     self.vel.y*=-1
+                    
+                # if (self.pos.y <= 0):
+                #     print ('crossing +y border')
+                #     self.vel.y*=-1
+                #checks if the mob is leaving the screen
+                self.acl = vec(0,0)
 
-            self.animate()
-            self.chase(self.game.player)
-            self.rect.center=self.pos
-            #sets the position
-            self.pos = self.pos + (self.vel * self.game.dt)
-            #changes the 
-            self.hit_rect.centerx=self.pos.x
-            collide_with_walls(self, self.game.all_walls, 'x')
-            collide_with_walls(self, self.game.all_ores, 'x')
-            # checks if the player is against a wall
-            self.hit_rect.centery = self.pos.y
-            #sets the y position
-            collide_with_walls(self, self.game.all_walls, 'y')
-            collide_with_walls(self, self.game.all_ores, 'y')
-            self.rect.center = self.hit_rect.center
-            # makes the collison with walls on the y axis 
+                self.animate()
+                self.aggroing(self.game.player)
+                #sets the position
+                self.acl.x += self.vel.x*MOB_FRIC
+                self.acl.y += self.vel.y*MOB_FRIC
+
+                self.vel.x += self.acl.x
+                self.vel.y += self.acl.y
+
+                
+                self.rect.center=self.pos
+
+                self.pos += self.vel + 0.5*self.acl
+                #changes the 
+                
+                self.hit_rect.centerx=self.pos.x
+                collide_with_walls(self, self.game.all_walls, 'x')
+                collide_with_walls(self, self.game.all_ores, 'x')
+                # checks if the player is against a wall
+                self.hit_rect.centery = self.pos.y
+                #sets the y position
+                collide_with_walls(self, self.game.all_walls, 'y')
+                collide_with_walls(self, self.game.all_ores, 'y')
+                self.rect.center = self.hit_rect.center
+                # makes the collison with walls on the y axis
 class Collectable(Sprite):  
         def __init__(self, game, x, y, collectable):
                 #init runs only once at the start
@@ -560,11 +592,13 @@ class Aggrorange(Sprite):
         self.radius = radius
         self.image = pg.Surface((TILESIZE*10, TILESIZE*10))
         self.image.set_colorkey(BLACK)
+        
         self.rect = self.image.get_rect()
         self.vel = vec(0,0) 
         self.pos = vec(x,y) * TILESIZE
         self.rect.center = self.pos
-        pg.draw.circle(self.image, GREEN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+        pg.draw.circle(self.image, CYAN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+        pg.draw.circle(self.image, BLACK, (TILESIZE*5, TILESIZE*5), TILESIZE*5-1)
         print (self.pos)
 
         
@@ -573,7 +607,8 @@ class Aggrorange(Sprite):
     def update(self):
         self.pos = self.enemy.pos
         self.rect.center = self.pos
-        pg.draw.circle(self.image, GREEN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+        pg.draw.circle(self.image, CYAN, (TILESIZE*5, TILESIZE*5), TILESIZE*5)
+        pg.draw.circle(self.image, BLACK, (TILESIZE*5, TILESIZE*5), TILESIZE*5-1)
 
 
 

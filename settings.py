@@ -8,8 +8,9 @@ TILESIZE = 32
 FPS = 30
 
 #enemy settings
-ENEMY_SPEED = 190
+ENEMY_SPEED = 1
 MOB_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)
+MOB_FRIC = -0.1
 
 #player settings
 PLAYER_SPEED=1
