@@ -15,6 +15,12 @@ import random as r
 #process: cursor position, position of player in game,score, enemy position, velocity, aim in fps \
 # output: sounds, graphics, haptics, 
 #ooh i changed something
+#sources: pygame official update logs: https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.collide_circle
+#Game stuff:
+#Goals: kill enemys, mine ores
+#Rule: enemys only folow you when you are in thier range, you cant go through walls
+#feedback: there are counters counting score for items and ores, mobs explode
+#Freedom: you can mine ores and avoid mobs or other stuff
 
 class Game:
     def __init__(self):
@@ -119,11 +125,12 @@ class Game:
     def draw(self):
         self.screen.fill(DGRAY)
         self.all_sprites.draw(self.screen)  
+        # sets the backround color and draws the sprites
         self.draw_text("Frames per second: "+ str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         self.draw_text(f"Coins: {self.player.coins}",24, WHITE, WIDTH/2, HEIGHT/6)
         self.draw_text(f"Ores: {self.player.ores}",24, WHITE, WIDTH/10, HEIGHT/8)
+        # writes some text on the screen that track info
         pg.display.flip()
-        # sets the backround color and draws the sprites
 
 
 if __name__ == "__main__":
